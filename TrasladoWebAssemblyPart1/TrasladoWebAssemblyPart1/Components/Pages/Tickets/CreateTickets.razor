@@ -1,0 +1,256 @@
+﻿@page "/CreateTickets"
+
+@inject TicketsService ticketService;
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+<EditForm Model="Tickets" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow-lg border-0 rounded" style="background-color: #f8f9fa;">
+        <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center">
+            <h3 class="mb-0"> <i class="fas fa-clipboard-list"></i> Registro de Tickets</h3>
+        </div>
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label for="TicketId" class="form-label">ID del Ticket:</label>
+                    <div class="input-group">
+                        <div style="width: 90%; height: 2em;">
+                            <InputNumber @bind-Value="Tickets.TicketId" class="form-control" style="font-size: 0.8em;" aria-describedby="BotonBuscar" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="Fecha" class="form-label">Fecha:</label>
+                    <div class="input-group">
+                        <div style="width: 46em; height: 2.5em;">
+                            <InputDate @bind-Value="Tickets.Fecha" class="form-control" style="font-size: 0.8em;" />
+                            <ValidationMessage For="@(() => Tickets.Fecha)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="ClienteId" class="form-label">Cliente Id:</label>
+                    <div class="input-group">
+                        <div style="width: 100%; height: 2em;">
+                            <InputNumber @bind-Value="Tickets.ClienteId" class="form-control" style="font-size: 0.8em;" />
+                            <ValidationMessage For="@(() => Tickets.ClienteId)" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 ">
+                    <label for="SistemaId" class="form-label">Sistema Id:</label>
+                    <div class="input-group">
+                        <div style="width: 100%; height: 2em;">
+                            <InputNumber @bind-Value="Tickets.SistemaId" class="form-control" style="font-size: 0.8em;" />
+                            <ValidationMessage For="@(() => Tickets.SistemaId)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="PrioridadId" class="form-label">Prioridad Id:</label>
+                    <div class="input-group">
+                        <div style="width: 100%; height: 2em;">
+                            <InputNumber @bind-Value="Tickets.PrioridadId" class="form-control" style="font-size: 0.8em;" />
+                            <ValidationMessage For="@(() => Tickets.PrioridadId)" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 ">
+                    <label for="SolicitadoPor" class="form-label">Solicitado Por:</label>
+                    <div class="input-group">
+                        <div style="width: 100%; height: 2em;">
+                            <InputText @bind-Value="Tickets.SolicitadoPor" class="form-control" style="font-size: 0.8em;" />
+                            <ValidationMessage For="@(() => Tickets.SolicitadoPor)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="mb-3">
+                <label for="Asunto" class="form-label">Asunto:</label>
+                <InputText @bind-Value="Tickets.Asunto" class="form-control" style="width: 60em; height: 2.5em" />
+                <ValidationMessage For="@(() => Tickets.Asunto)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Descripcion" class="form-label">Descripción:</label>
+                <InputText @bind-Value="Tickets.Descripcion" class="form-control" style="width: 60em; height: 5em" />
+                <ValidationMessage For="@(() => Tickets.Descripcion)" />
+            </div>
+
+        </div>
+
+        <!-- INICIO DETALLES DEL TICKET -->
+        <div class="card-header bg-primary text-white text-center">
+            <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Detalles del Ticket</h3>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="row">
+
+                <div class="col">
+                    <div>
+                        <label class="fw-bold">Emisor:</label>
+                        <InputText class="form-control mb-2" @bind-Value="detalles.Emisor"></InputText>
+                    </div>
+                    <div>
+                        <label class="fw-bold">Mensaje:</label>
+                        <InputTextArea class="form-control mb-2" @bind-Value="detalles.Mensaje"></InputTextArea>
+                    </div>
+                    <div class="text-end mb-2">
+                        <button type="button" class="btn btn-success" @onclick="agregarDetalle"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+
+                <div class="col-5">
+                    <div class="mb-4"></div>
+                    <table class="table table-bordered text-center">
+
+                        <thead class="bg-secondary text-white">
+                            <tr>
+                                <th class="col-3">Emisor</th>
+                                <th class="col-7">Mensaje</th>
+                                <th class="col-1">Eliminar</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (ListaDetalles.Any())
+                            {
+                                @foreach (var item in ListaDetalles)
+                                {
+                                    <tr>
+                                        <td class="col-3">@item.Emisor</td>
+                                        <td class="col-7">@item.Mensaje</td>
+                                        <td class="col-1"><button class="bi bi-dash-circle-fill" type="button" style="background: transparent; border: none;" @onclick="(() => eliminarDetalle(item))"></button></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="3">No hay mensajes...</td></tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <!-- FIN DETALLES DEL TICKET -->
+
+
+        <div class="card-footer bg-light d-flex justify-content-center mt-3">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary ml-2" @onclick="Nuevo"><span class="bi bi-plus"></span> Nuevo </button>
+                <button type="submit" class="btn btn-outline-success ml-2"><span class="bi bi-check-circle-fill"></span> Guardar </button>
+                <a type="button" href="/TicketsIndex/" class="btn btn-outline-danger"><span class="fas fa-arrow-left"></span> Retroceder </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+
+    public Tickets Tickets = new Tickets();
+    private bool asuntoExistente = false;
+
+    public TicketsDetalles detalles = new TicketsDetalles();
+
+    public List<TicketsDetalles> ListaDetalles = new List<TicketsDetalles>();
+
+    public void Nuevo()
+    {
+        Tickets = new Tickets();
+        asuntoExistente = false;
+    }
+
+    public async Task Buscar()
+    {
+        asuntoExistente = false;
+        var asuntoEncontrado = await ticketService.Buscar(Tickets.TicketId);
+
+        if (asuntoEncontrado != null)
+        {
+            Tickets = asuntoEncontrado;
+        }
+        else
+        {
+            Nuevo();
+        }
+    }
+
+    public bool Verificar()
+    {
+
+        asuntoExistente = ticketService.Listar(t => t.Asunto.ToLower() == Tickets.Asunto.ToLower()
+        && t.TicketId != Tickets.TicketId).Result.Any();
+
+        return asuntoExistente;
+    }
+
+    public async Task Guardar()
+    {
+
+        if (Verificar())
+        {
+            return;
+        }
+        var guardo = await ticketService.Guardar(Tickets);
+        if (guardo)
+        {
+            Nuevo();
+            Console.WriteLine(Tickets);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+
+        if (await ticketService.Verificar(Tickets.TicketId) && await ticketService.Eliminar(Tickets))
+        {
+            Nuevo();
+        }
+        else
+        {
+            return;
+        }
+
+    }
+
+
+    public async Task agregarDetalle()
+    {
+        if (!string.IsNullOrEmpty(detalles.Emisor) && !string.IsNullOrEmpty(detalles.Mensaje))
+        {
+            ListaDetalles.Add(new TicketsDetalles(0, detalles.Emisor, detalles.Mensaje));
+            detalles.Emisor = "";
+            detalles.Mensaje = "";
+        }
+    }
+
+    public async Task eliminarDetalle(TicketsDetalles details)
+    {
+        detalles.Emisor = details.Emisor;
+        detalles.Mensaje = details.Mensaje;
+
+        
+        ListaDetalles.Remove(details);
+    }
+
+}
+

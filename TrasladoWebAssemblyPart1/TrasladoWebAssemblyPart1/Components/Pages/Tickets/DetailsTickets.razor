@@ -1,0 +1,146 @@
+﻿@page "/DetailsTickets/{TicketId:int}";
+
+@inject TicketsService ticketService;
+@inject DetailsTickets DetailsTickets
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+<div class="card shadow-lg border-0 rounded" style="background-color: #f8f9fa;">
+    <div class="card-header bg-primary text-white text-center py-2 rounded">
+        <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Detalles de Tickets</h3>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label ">Fecha:</label>
+                <span>@Tickets.Fecha</span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label">Cliente Id:</label>
+                <span>@Tickets.ClienteId</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label">Sistema Id:</label>
+                <span>@Tickets.SistemaId</span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label">Prioridad Id:</label>
+                <span>@Tickets.PrioridadId</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label">Solicitado Por:</label>
+                <span>@Tickets.SolicitadoPor</span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label">Asunto:</label>
+                <span>@Tickets.Asunto</span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label style="font-weight: bold;" class="form-label">Descripci&oacuten:</label>
+                <span>@Tickets.Descripcion</span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- INICIO DETALLES DEL TICKET -->
+    <div class="card-header bg-primary text-white text-center">
+        <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Detalles del Ticket</h3>
+    </div>
+
+    <div class="modal-body">
+
+        <div class="row">
+
+            <div class="col">
+                <div class="mb-4"></div>
+                <table class="table table-bordered text-center">
+
+                    <thead class="bg-secondary text-white">
+                        <tr>
+                            <th class="col-3">Emisor</th>
+                            <th class="col-7">Mensaje</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (ListaDetalles.Any())
+                        {
+                            @foreach (var item in ListaDetalles)
+                            {
+                                <tr>
+                                    <td class="col-3">@item.Emisor</td>
+                                    <td class="col-7">@item.Mensaje</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3">No hay mensajes...</td></tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <!-- FIN DETALLES DEL TICKET -->
+
+
+    <div class="card-footer bg-light d-flex justify-content-end">
+        <div class="btn-group">
+            <a type="button" href="/TicketsIndex/" class="btn btn-outline-danger"><span class="fas fa-arrow-left"></span> Retroceder </a>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public Tickets Tickets = new Tickets();
+    public TicketsDetalles detalles = new TicketsDetalles();
+
+    public List<TicketsDetalles> ListaDetalles = new List<TicketsDetalles>();
+    public List<TicketsDetalles> ListaDetallesEliminados = new List<TicketsDetalles>();
+
+
+    [Parameter]
+    public int TicketId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tickets.Fecha = DateTime.Today;
+
+        if (TicketId > 0)
+        {
+            await Buscar();
+        }
+    }
+
+    public async Task Buscar()
+    {
+        var ticket = await ticketService.Buscar(TicketId);
+        if (ticket != null)
+        {
+            Tickets = ticket;
+
+            ListaDetalles = await DetailsTickets.Listar(t => t.TicketId == ticket.TicketId);
+        }
+    }
+
+}
+    
+
+

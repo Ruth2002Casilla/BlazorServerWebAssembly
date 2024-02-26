@@ -1,0 +1,84 @@
+﻿@page "/DeleteTickets/{TicketID:int}";
+
+@inject TicketsService ticketService;
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+<div class="card shadow-lg border-0 rounded" style="background-color: #f8f9fa;">
+    <div class="card-header bg-primary text-white text-center py-2 rounded">
+        <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Eliminar Ticket</h3>
+    </div>
+
+    <div class="card-body text-center">
+        <div class="col-md-6 mb-3 mx-auto">
+            <label style="font-weight: bold;" class="form-label font-weight-bold">Ticket ID:</label>
+            <span>@Tickets.TicketId</span>
+        </div>
+
+        <div class="col-md-6 mb-3 mx-auto">
+            <label style="font-weight: bold;" class="form-label font-weight-bold">Cliente ID:</label>
+            <span>@Tickets.ClienteId</span>
+        </div>
+
+        <div class="col-md-6 mb-3 mx-auto">
+            <label style="font-weight: bold;" class="form-label font-weight-bold">Asunto:</label>
+            <span>@Tickets.Asunto</span>
+        </div>
+
+        <div class="col-md-6 mb-3 mx-auto">
+            <label style="font-weight: bold;" class="form-label font-weight-bold">Fecha:</label>
+            <span>@Tickets.Fecha</span>
+        </div>
+
+        <div class="col-md-12 mb-3 mx-auto">
+            <p style="font-weight: bold;">¿Seguro que deseas eliminar este ticket?</p>
+        </div>
+
+    </div>
+
+    <div class="card-footer bg-light d-flex justify-content-center">
+        <div class="btn-group">
+            <button @onclick="Eliminar" type="button" class="btn btn-success btn-block"><span class="fas fa-check"></span> Sí</button>
+            <a href="/TicketsIndex/" class="btn btn-danger btn-block"><span class="fas fa-times"></span> No</a>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    public Tickets Tickets = new Tickets();
+
+    [Parameter]
+
+    public int TicketId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (TicketId > 0)
+        {
+            Tickets.TicketId = TicketId;
+            await Buscar();
+        }
+    }
+
+    public async Task Buscar()
+    {
+        var existe = await ticketService.Buscar(Tickets.TicketId);
+        if (existe != null)
+        {
+            Tickets = existe;
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        var elimino = await ticketService.Eliminar(Tickets);
+        if (elimino)
+        {
+            NavigationManager.NavigateTo("/TicketsIndex");
+        }
+    }
+
+}
+
